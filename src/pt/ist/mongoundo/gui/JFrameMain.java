@@ -5,6 +5,7 @@
  */
 package pt.ist.mongoundo.gui;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
@@ -12,12 +13,14 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.List;
 import java.util.ArrayList;
-import javax.swing.DefaultListModel;
+import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.basic.BasicListUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -25,8 +28,10 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import pt.ist.mongoundo.MongoUndo;
+import pt.ist.mongoundo.MongoUndoConstants;
 
 /**
  *
@@ -40,8 +45,7 @@ public class JFrameMain extends javax.swing.JFrame {
     public JFrameMain() {
         initComponents();
         hideScreen();
-        
-        
+
     }
 
     /**
@@ -59,9 +63,19 @@ public class JFrameMain extends javax.swing.JFrame {
         tabMain = new javax.swing.JTabbedPane();
         pnlDocuments = new javax.swing.JPanel();
         jSplitPane2 = new javax.swing.JSplitPane();
-        pnlInfo = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        lstDocuments = new javax.swing.JList<>();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jTableDocumentLog = new javax.swing.JTable();
+        jLabel7 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTableDocumentVersions = new javax.swing.JTable();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jTableDocuments = new javax.swing.JTable();
+        jLabel5 = new javax.swing.JLabel();
         pnlLog = new javax.swing.JPanel();
         jSplitPane3 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -87,8 +101,11 @@ public class JFrameMain extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(100, 100));
+
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("MongoUndo");
         tree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        tree.setMinimumSize(new java.awt.Dimension(100, 100));
         tree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 treeValueChanged(evt);
@@ -100,27 +117,107 @@ public class JFrameMain extends javax.swing.JFrame {
 
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        javax.swing.GroupLayout pnlInfoLayout = new javax.swing.GroupLayout(pnlInfo);
-        pnlInfo.setLayout(pnlInfoLayout);
-        pnlInfoLayout.setHorizontalGroup(
-            pnlInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 334, Short.MAX_VALUE)
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jTableDocumentLog.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane5.setViewportView(jTableDocumentLog);
+
+        jLabel7.setText("Operations that affected this document");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        pnlInfoLayout.setVerticalGroup(
-            pnlInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE))
         );
 
-        jSplitPane2.setTopComponent(pnlInfo);
+        jSplitPane1.setTopComponent(jPanel3);
 
-        lstDocuments.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane2.setViewportView(lstDocuments);
+        jTableDocumentVersions.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(jTableDocumentVersions);
 
-        jSplitPane2.setRightComponent(jScrollPane2);
+        jLabel6.setText("Versions of this document");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE))
+        );
+
+        jSplitPane1.setRightComponent(jPanel2);
+
+        jSplitPane2.setRightComponent(jSplitPane1);
+
+        jTableDocuments.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane6.setViewportView(jTableDocuments);
+
+        jLabel5.setText("Documents in this collection");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
+        );
+
+        jLabel5.getAccessibleContext().setAccessibleName("jLabelDocumentsTable");
+
+        jSplitPane2.setTopComponent(jPanel1);
 
         javax.swing.GroupLayout pnlDocumentsLayout = new javax.swing.GroupLayout(pnlDocuments);
         pnlDocuments.setLayout(pnlDocumentsLayout);
@@ -131,7 +228,7 @@ public class JFrameMain extends javax.swing.JFrame {
         pnlDocumentsLayout.setVerticalGroup(
             pnlDocumentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDocumentsLayout.createSequentialGroup()
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                .addComponent(jSplitPane2)
                 .addContainerGap())
         );
 
@@ -206,7 +303,7 @@ public class JFrameMain extends javax.swing.JFrame {
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(lblO))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 611, Short.MAX_VALUE)
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRecoverSelective)
                     .addComponent(btnRecoverUndo)))
@@ -218,11 +315,11 @@ public class JFrameMain extends javax.swing.JFrame {
         pnlLog.setLayout(pnlLogLayout);
         pnlLogLayout.setHorizontalGroup(
             pnlLogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+            .addComponent(jSplitPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
         );
         pnlLogLayout.setVerticalGroup(
             pnlLogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+            .addComponent(jSplitPane3)
         );
 
         tabMain.addTab("Log", pnlLog);
@@ -270,11 +367,11 @@ public class JFrameMain extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPaneMain, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
+            .addComponent(jSplitPaneMain, javax.swing.GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPaneMain, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+            .addComponent(jSplitPaneMain, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
@@ -287,7 +384,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private void jMenuItemMongoConnectionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMongoConnectionsActionPerformed
         JDialogConnections jDialogConnections = new JDialogConnections(this, true);
         jDialogConnections.setVisible(true);
-        
+
     }//GEN-LAST:event_jMenuItemMongoConnectionsActionPerformed
 
     private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAboutActionPerformed
@@ -298,11 +395,10 @@ public class JFrameMain extends javax.swing.JFrame {
     private void treeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         populateDocuments(node.getParent().toString(), node.toString());
-        populateLog(node.getParent().toString(), node.toString());
-        
+        populateCollectionLog(node.getParent().toString(), node.toString());
+
     }//GEN-LAST:event_treeValueChanged
 
- 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRecoverSelective;
@@ -311,26 +407,36 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBarMain;
     private javax.swing.JMenuItem jMenuItemAbout;
     private javax.swing.JMenuItem jMenuItemMongoConnections;
     private javax.swing.JMenuItem jMenuItemQuit;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JSplitPane jSplitPaneMain;
+    private javax.swing.JTable jTableDocumentLog;
+    private javax.swing.JTable jTableDocumentVersions;
+    private javax.swing.JTable jTableDocuments;
     private javax.swing.JLabel lblNs;
     private javax.swing.JLabel lblO;
     private javax.swing.JLabel lblOp;
     private javax.swing.JLabel lblTs;
-    private javax.swing.JList<String> lstDocuments;
     private javax.swing.JPanel pnlDocuments;
-    private javax.swing.JPanel pnlInfo;
     private javax.swing.JPanel pnlLog;
     private javax.swing.JPanel pnlRecoverActions;
     private javax.swing.JTabbedPane tabMain;
@@ -338,151 +444,276 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JTree tree;
     // End of variables declaration//GEN-END:variables
 
-    private void hideScreen(){
+    private void hideScreen() {
         this.tree.removeAll();
-        this.lstDocuments.removeAll();
-                
-                
+        this.jTableDocuments.removeAll();
+
     }
-    
-    
-    
-    
-	public void populateTree() {
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-		((DefaultMutableTreeNode) model.getRoot()).removeAllChildren();
 
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode("MongoDatabases");
+    public void populateTree() {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        ((DefaultMutableTreeNode) model.getRoot()).removeAllChildren();
 
-		List<String> databaseNames = MongoUndo.mongoClient.getDatabaseNames();
-		for (String databaseName : databaseNames) {
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode("MongoDatabases");
 
-			DefaultMutableTreeNode databaseNode = new DefaultMutableTreeNode(databaseName);
-			top.add(databaseNode);
-			MongoDatabase database = MongoUndo.mongoClient.getDatabase(databaseName);
-			MongoIterable<String> collections = database.listCollectionNames();
+        List<String> databaseNames = MongoUndo.mongoClient.getDatabaseNames();
+        for (String databaseName : databaseNames) {
 
-			for (String collection : collections) {
+            DefaultMutableTreeNode databaseNode = new DefaultMutableTreeNode(databaseName);
+            top.add(databaseNode);
+            MongoDatabase database = MongoUndo.mongoClient.getDatabase(databaseName);
+            MongoIterable<String> collections = database.listCollectionNames();
 
-				DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(collection);
-				databaseNode.add(tableNode);
+            for (String collection : collections) {
 
-			}
+                DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(collection);
+                databaseNode.add(tableNode);
 
-		}
+            }
 
-		((DefaultMutableTreeNode) model.getRoot()).add(top);
-		model.reload();
-	}
+        }
 
-	private void populateDocuments(String databaseName, String collectionName) {
-		lstDocuments.removeAll();
-		DefaultListModel listModel = new DefaultListModel<String>();
+        ((DefaultMutableTreeNode) model.getRoot()).add(top);
+        model.reload();
+    }
 
-		MongoDatabase database = MongoUndo.mongoClient.getDatabase(databaseName);
-		FindIterable<Document> documents = database.getCollection(collectionName).find();
-		for (Document document : documents) {
-			DefaultMutableTreeNode documentNode = new DefaultMutableTreeNode(document.toString());
-			listModel.addElement(documentNode.toString());
-		}
-		lstDocuments.setModel(listModel);
-	}
+    private void populateDocuments(String databaseName, String collectionName) {
+        jTableDocuments.removeAll();
 
-	private void populateLog(String database, String collection) {
-		
-		
-		
-		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-		renderer.setFont(renderer.getFont().deriveFont(Font.BOLD));
+        ArrayList<String> headers = new ArrayList<String>();
 
-		String[] columns = new String[] { "undo", "ts", "op", "ns", "o" };
+        MongoDatabase database = MongoUndo.mongoClient.getDatabase(databaseName);
+        FindIterable<Document> documents = database.getCollection(collectionName).find();
+        ArrayList<HashMap<String, String>> rows = new ArrayList<HashMap<String, String>>();
+        for (Document document : documents) {
+            HashMap<String, String> row = new HashMap<String, String>();
+            for (String key : document.keySet()) {
+                if (!headers.contains(key)) {
+                    headers.add(key);
+                }
+                row.put(key, document.get(key).toString());
+            }
+            rows.add(row);
+        }
 
-		ArrayList<Object[]> dataList = new ArrayList<Object[]>();
+        Object[][] data = new Object[rows.size()][headers.size()];
+        for (int i = 0; i < rows.size(); i++) {
+            for (int j = 0; j < headers.size(); j++) {
 
-		tblLog.removeAll();
+                data[i][j] = rows.get(i).get(headers.get(j));
 
-		FindIterable<Document> it = MongoUndo.mongoClient.getDatabase("local").getCollection("oplog.$main")
-				.find(new Document("ns", database + "." + collection));
+            }
+        }
 
-		for (Document logEntry : it) {
-			Object[] line = new Object[5];
-			line[0] = false;
-			line[1] = logEntry.get(columns[1]).toString();
-			line[2] = logEntry.get(columns[2]).toString();
-			line[3] = logEntry.get(columns[3]).toString();
-			line[4] = logEntry.get(columns[4]).toString();
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, headers.toArray());
+        ListSelectionListener listSelectionListener = new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (jTableDocuments.getSelectedRow() < 0) {
+                    return;
+                }
+                int index = jTableDocuments.getSelectedRow();
+                Object _id = jTableDocuments.getValueAt(index, 0);
+                populateDocumentLog(databaseName, collectionName, _id.toString());
 
-			dataList.add(line);
+            }
+        };
 
-		}
+        jTableDocuments.setModel(defaultTableModel);
+        jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
+    }
 
-		Object[][] data = new Object[dataList.size()][5];
-		for (int i = 0; i < dataList.size(); i++) {
-			JCheckBox undoCheckBox = new JCheckBox();
+    private void populateDocumentLog(String database, String collection, String _id) {
+        jTableDocumentLog.removeAll();
+        String ns = database + "." + collection;
+        ObjectId id = new ObjectId(_id);
+        System.out.println("Selected=" + _id + " from ns=" + ns);
+        HashMap<String, Object> whereMap = new HashMap<String, Object>();
 
-			data[i] = dataList.get(i);
-		}
-		DefaultTableModel tableModel = new DefaultTableModel(data, columns){
-                    @Override
-                    public Class<?> getColumnClass(int columnIndex) {
-                        if(columnIndex == 0){
-                            return Boolean.class;
-                        }
-                        return String.class;
+        whereMap.put("ns", ns);
+
+        HashMap<String, Object> or = new HashMap<String, Object>();
+
+        Document o = new Document("o._id", id);
+        Document o2 = new Document("o2._id", id);
+
+        ArrayList<Document> oArray = new ArrayList<Document>();
+        oArray.add(o);
+        oArray.add(o2);
+        whereMap.put("$or", oArray);
+
+        Document where = new Document(whereMap);
+
+        FindIterable<Document> itLogEntries = MongoUndo.mongoClient.
+                getDatabase(MongoUndoConstants.LOCAL_DB).
+                getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where).sort(new Document("ts", -1));
+        populateDocumentVersions(MongoUndo.mongoClient.
+                getDatabase(MongoUndoConstants.LOCAL_DB).
+                getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where).sort(new Document("ts", 1)));
+        String[] headers = new String[]{"ts", "op", "ns", "o"};
+        ArrayList<String[]> rows = new ArrayList<String[]>();
+        for (Document logEntry : itLogEntries) {
+            System.out.println("LogEntry:" + logEntry.toString());
+            rows.add(new String[]{
+                logEntry.get(headers[0]).toString(),
+                logEntry.get(headers[1]).toString(),
+                logEntry.get(headers[2]).toString(),
+                logEntry.get(headers[3]).toString()
+            });
+        }
+        String[][] data = new String[rows.size()][headers.length];
+        for (int i = 0; i < rows.size(); i++) {
+            data[i] = rows.get(i);
+        }
+        jTableDocumentLog.setModel(new DefaultTableModel(data, headers));
+    }
+
+    private void populateDocumentVersions(FindIterable<Document> logEntries) {
+        jTableDocumentVersions.removeAll();
+
+        ArrayList<String> headers = new ArrayList<>();
+        headers.add("Version");
+        ArrayList<HashMap<String, Object>> rows = new ArrayList<>();
+        HashMap<String, Object> row = new HashMap<>();
+        for (Document logEntry : logEntries) {
+            Document document = (Document) logEntry.get("o");
+
+            if(logEntry.get("op").equals("i")){
+                
+            }else if(logEntry.get("op").equals("u")){
+                document = (Document) document.get("$set");
+            
+            }
+            if (document != null) {
+                for (String key : document.keySet()) {
+                    row.put(key, document.get(key));
+                    if (!headers.contains(key)) {
+                        headers.add(key);
                     }
-
-                    @Override
-                    public boolean isCellEditable(int row, int column) {
-                        return true;
+                }
+            }
+            if (logEntry.containsKey("o2")) {
+                System.out.println("o2");
+                document = (Document) logEntry.get("o2");
+//              HashMap<String, Object> row = new HashMap<String, Object>();
+                for (String key : document.keySet()) {
+                    row.put(key, document.get(key));
+                    if (!headers.contains(key)) {
+                        headers.add(key);
                     }
-                    
-                    
-                    
-                };
+                }
+            }
+            rows.add((HashMap<String, Object>) row.clone());
+        }
+        int i = 0, j = 0;
+        Object[][] data = new Object[rows.size()][headers.size()];
+        for (HashMap<String, Object> r : rows) {
+            
+            for (String key : headers) {
+                if(j == 0){
+                    data[i][0] = i+1;
+                    j++;
+                    continue;
+                }
+                if (r.containsKey(key)) {
+                    data[i][j] = r.get(key);
+                } else {
+                    data[i][j] = "";
+                }
 
-		tblLog.setModel(tableModel);
-		resizeColumnWidth(tblLog);
-		
-		DefaultListSelectionModel defaultListSelectionModel = new DefaultListSelectionModel();
-		defaultListSelectionModel.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
+                j++;
+            }
+            i++;
+            j = 0;
+        }
+        
+        jTableDocumentVersions.setModel(new DefaultTableModel(data, headers.toArray()));
+    }
+
+    private void populateCollectionLog(String database, String collection) {
+
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setFont(renderer.getFont().deriveFont(Font.BOLD));
+
+        String[] columns = new String[]{"undo", "ts", "op", "ns", "o"};
+
+        ArrayList<Object[]> dataList = new ArrayList<Object[]>();
+
+        tblLog.removeAll();
+
+        FindIterable<Document> it = MongoUndo.mongoClient.getDatabase("local").getCollection("oplog.$main")
+                .find(new Document("ns", database + "." + collection));
+
+        for (Document logEntry : it) {
+            Object[] line = new Object[5];
+            line[0] = false;
+            line[1] = logEntry.get(columns[1]).toString();
+            line[2] = logEntry.get(columns[2]).toString();
+            line[3] = logEntry.get(columns[3]).toString();
+            line[4] = logEntry.get(columns[4]).toString();
+
+            dataList.add(line);
+
+        }
+
+        Object[][] data = new Object[dataList.size()][5];
+        for (int i = 0; i < dataList.size(); i++) {
+            JCheckBox undoCheckBox = new JCheckBox();
+
+            data[i] = dataList.get(i);
+        }
+        DefaultTableModel tableModel = new DefaultTableModel(data, columns) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {
+                    return Boolean.class;
+                }
+                return String.class;
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return true;
+            }
+
+        };
+
+        tblLog.setModel(tableModel);
+        resizeColumnWidth(tblLog);
+
+        DefaultListSelectionModel defaultListSelectionModel = new DefaultListSelectionModel();
+        defaultListSelectionModel.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
 //				if (e.getFirstIndex() != e.getLastIndex()){
 //					lblTs.setText("");
 //					lblNs.setText("");
 //					lblOp.setText("");
 //					lblO.setText("");
 //				}else{
-					lblTs.setText(data[e.getLastIndex()][1].toString());
-					lblNs.setText(data[e.getLastIndex()][2].toString());
-					lblOp.setText(data[e.getLastIndex()][3].toString());
-					lblO.setText(data[e.getLastIndex()][4].toString());
-					
-					
-					
-					
-					
-//				}
-				
-				
-			}
-		});
-		tblLog.setSelectionModel(defaultListSelectionModel);
-	}
+                lblTs.setText(data[e.getLastIndex()][1].toString());
+                lblNs.setText(data[e.getLastIndex()][2].toString());
+                lblOp.setText(data[e.getLastIndex()][3].toString());
+                lblO.setText(data[e.getLastIndex()][4].toString());
 
-	public void resizeColumnWidth(JTable table) {
-	    final TableColumnModel columnModel = table.getColumnModel();
-	    for (int column = 0; column < table.getColumnCount(); column++) {
-	        int width = 50; // Min width
-	        for (int row = 0; row < table.getRowCount(); row++) {
-	            TableCellRenderer renderer = table.getCellRenderer(row, column);
-	            Component comp = table.prepareRenderer(renderer, row, column);
-	            width = Math.max(comp.getPreferredSize().width +1 , width);
-	        }
-	        columnModel.getColumn(column).setPreferredWidth(width);
-	    }
-	}
-        
-       
+//				}
+            }
+        });
+        tblLog.setSelectionModel(defaultListSelectionModel);
+    }
+
+    public void resizeColumnWidth(JTable table) {
+        final TableColumnModel columnModel = table.getColumnModel();
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            int width = 50; // Min width
+            for (int row = 0; row < table.getRowCount(); row++) {
+                TableCellRenderer renderer = table.getCellRenderer(row, column);
+                Component comp = table.prepareRenderer(renderer, row, column);
+                width = Math.max(comp.getPreferredSize().width + 1, width);
+            }
+            columnModel.getColumn(column).setPreferredWidth(width);
+        }
+    }
+
 }

@@ -202,6 +202,7 @@ public class JDialogConnections extends javax.swing.JDialog {
         try {
 
 //            lblState.setText("Connecting to " + mongoConnection.getServerAddress() + ":" + mongoConnection.getServerPort());
+            System.out.println("Going to connect to : " + getSelectedMongoConnection(connections).getServerAddress() + ":" + getSelectedMongoConnection(connections).getServerPort());
             mongoClient = new MongoClient(getSelectedMongoConnection(connections).getServerAddress(), getSelectedMongoConnection(connections).getServerPort());
         } catch (Exception e) {
 //            lblState.setText("<html>" + lblState.getText() + "<br>Failed to connect to database</html>");

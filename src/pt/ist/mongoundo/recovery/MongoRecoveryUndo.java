@@ -29,7 +29,10 @@ public class MongoRecoveryUndo extends MongoRecovery{
      * @param opLog the opLog entry specifying the operation that should be removed 
      */
     private void undoOperation(OpLog opLog){
-        ArrayList<OpLog> dependencies = getDependencies(opLog);
+//        ArrayList<OpLog> operationsBefore = getOperationsBefore(opLog);
+//        for (OpLog  : operationsBefore){
+//            
+//        }
     }
     
     /**
@@ -37,9 +40,16 @@ public class MongoRecoveryUndo extends MongoRecovery{
      * @param opLog
      * @return 
      */
-    private ArrayList<OpLog> getDependencies(OpLog opLog){
+    private ArrayList<OpLog> getDocumentOperations(OpLog opLog){
         return null;
     }
     
+    
+    
+    
+    
+    private String getUndoOperation(){
+        return "";
+    }
     
 }
