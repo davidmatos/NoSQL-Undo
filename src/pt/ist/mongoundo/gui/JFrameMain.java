@@ -13,11 +13,14 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicListUI;
@@ -29,9 +32,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import pt.ist.mongoundo.DocumentVersions;
 
 import pt.ist.mongoundo.MongoUndo;
 import pt.ist.mongoundo.MongoUndoConstants;
+import pt.ist.mongoundo.MongoUndoUtils;
 
 /**
  *
@@ -78,8 +83,6 @@ public class JFrameMain extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         pnlLog = new javax.swing.JPanel();
         jSplitPane3 = new javax.swing.JSplitPane();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tblLog = new javax.swing.JTable();
         pnlRecoverActions = new javax.swing.JPanel();
         btnRecoverSelective = new javax.swing.JButton();
         btnRecoverUndo = new javax.swing.JButton();
@@ -91,6 +94,12 @@ public class JFrameMain extends javax.swing.JFrame {
         lblOp = new javax.swing.JLabel();
         lblNs = new javax.swing.JLabel();
         lblO = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jTextFieldSearch = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblLog = new javax.swing.JTable();
         jMenuBarMain = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItemMongoConnections = new javax.swing.JMenuItem();
@@ -234,21 +243,6 @@ public class JFrameMain extends javax.swing.JFrame {
 
         tabMain.addTab("Documents", pnlDocuments);
 
-        tblLog.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(tblLog);
-
-        jSplitPane3.setLeftComponent(jScrollPane3);
-
         btnRecoverSelective.setText("Selective Recovery");
         btnRecoverSelective.setToolTipText("");
 
@@ -267,15 +261,10 @@ public class JFrameMain extends javax.swing.JFrame {
         pnlRecoverActionsLayout.setHorizontalGroup(
             pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
-                .addComponent(btnRecoverUndo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnRecoverSelective))
-            .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
+                    .addComponent(jLabel3))
                 .addGap(47, 47, 47)
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -283,6 +272,14 @@ public class JFrameMain extends javax.swing.JFrame {
                     .addComponent(lblNs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblO, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
+                .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
+                        .addComponent(btnRecoverUndo)
+                        .addGap(67, 67, 67)
+                        .addComponent(btnRecoverSelective))
+                    .addComponent(jLabel4))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         pnlRecoverActionsLayout.setVerticalGroup(
             pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,13 +300,68 @@ public class JFrameMain extends javax.swing.JFrame {
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(lblO))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 611, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 702, Short.MAX_VALUE)
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRecoverSelective)
                     .addComponent(btnRecoverUndo)))
         );
 
         jSplitPane3.setRightComponent(pnlRecoverActions);
+
+        jLabel8.setText("Operations in this collection");
+
+        jLabel9.setText("search");
+
+        jTextFieldSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldSearchActionPerformed(evt);
+            }
+        });
+        jTextFieldSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextFieldSearchKeyTyped(evt);
+            }
+        });
+
+        tblLog.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(tblLog);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+            .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextFieldSearch)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(jTextFieldSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
+        );
+
+        jSplitPane3.setLeftComponent(jPanel4);
 
         javax.swing.GroupLayout pnlLogLayout = new javax.swing.GroupLayout(pnlLog);
         pnlLog.setLayout(pnlLogLayout);
@@ -395,9 +447,19 @@ public class JFrameMain extends javax.swing.JFrame {
     private void treeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         populateDocuments(node.getParent().toString(), node.toString());
-        populateCollectionLog(node.getParent().toString(), node.toString());
+        populateCollectionLog(node.getParent().toString(), node.toString(), "");
 
     }//GEN-LAST:event_treeValueChanged
+
+    private void jTextFieldSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldSearchActionPerformed
+
+    }//GEN-LAST:event_jTextFieldSearchActionPerformed
+
+    private void jTextFieldSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldSearchKeyTyped
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        populateDocuments(node.getParent().toString(), node.toString());
+        populateCollectionLog(node.getParent().toString(), node.toString(), jTextFieldSearch.getText());
+    }//GEN-LAST:event_jTextFieldSearchKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -410,6 +472,8 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBarMain;
@@ -419,6 +483,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -432,6 +497,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JTable jTableDocumentLog;
     private javax.swing.JTable jTableDocumentVersions;
     private javax.swing.JTable jTableDocuments;
+    private javax.swing.JTextField jTextFieldSearch;
     private javax.swing.JLabel lblNs;
     private javax.swing.JLabel lblO;
     private javax.swing.JLabel lblOp;
@@ -523,16 +589,17 @@ public class JFrameMain extends javax.swing.JFrame {
         jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
     }
 
+ 
+
     private void populateDocumentLog(String database, String collection, String _id) {
         jTableDocumentLog.removeAll();
+
         String ns = database + "." + collection;
         ObjectId id = new ObjectId(_id);
         System.out.println("Selected=" + _id + " from ns=" + ns);
         HashMap<String, Object> whereMap = new HashMap<String, Object>();
 
         whereMap.put("ns", ns);
-
-        HashMap<String, Object> or = new HashMap<String, Object>();
 
         Document o = new Document("o._id", id);
         Document o2 = new Document("o2._id", id);
@@ -547,9 +614,7 @@ public class JFrameMain extends javax.swing.JFrame {
         FindIterable<Document> itLogEntries = MongoUndo.mongoClient.
                 getDatabase(MongoUndoConstants.LOCAL_DB).
                 getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where).sort(new Document("ts", -1));
-        populateDocumentVersions(MongoUndo.mongoClient.
-                getDatabase(MongoUndoConstants.LOCAL_DB).
-                getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where).sort(new Document("ts", 1)));
+        populateDocumentVersions(database, collection, _id);
         String[] headers = new String[]{"ts", "op", "ns", "o"};
         ArrayList<String[]> rows = new ArrayList<String[]>();
         for (Document logEntry : itLogEntries) {
@@ -566,59 +631,38 @@ public class JFrameMain extends javax.swing.JFrame {
             data[i] = rows.get(i);
         }
         jTableDocumentLog.setModel(new DefaultTableModel(data, headers));
+        ListSelectionListener listSelectionListener = new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (jTableDocumentLog.getSelectedRow() < 0) {
+                    return;
+                }
+                int index = jTableDocumentLog.getSelectedRow();
+                jTableDocumentVersions.setRowSelectionInterval(index, index);
+
+            }
+        };
+        jTableDocumentLog.getSelectionModel().addListSelectionListener(listSelectionListener);
     }
 
-    private void populateDocumentVersions(FindIterable<Document> logEntries) {
+    private void populateDocumentVersions(String database, String collection, String _id) {
         jTableDocumentVersions.removeAll();
 
-        ArrayList<String> headers = new ArrayList<>();
-        headers.add("Version");
-        ArrayList<HashMap<String, Object>> rows = new ArrayList<>();
-        HashMap<String, Object> row = new HashMap<>();
-        for (Document logEntry : logEntries) {
-            Document document = (Document) logEntry.get("o");
+        DocumentVersions documentVersions = MongoUndoUtils.getDocumentVersions(database, collection, _id);
+        int i = 0, j = 0, size = documentVersions.getRows().size();
+        Object[][] data = new Object[documentVersions.getRows().size()][documentVersions.getHeaders().size()];
+        for (HashMap<String, Object> r : documentVersions.getRows()) {
 
-            if(logEntry.get("op").equals("i")){
-                
-            }else if(logEntry.get("op").equals("u")){
-                document = (Document) document.get("$set");
-            
-            }
-            if (document != null) {
-                for (String key : document.keySet()) {
-                    row.put(key, document.get(key));
-                    if (!headers.contains(key)) {
-                        headers.add(key);
-                    }
-                }
-            }
-            if (logEntry.containsKey("o2")) {
-                System.out.println("o2");
-                document = (Document) logEntry.get("o2");
-//              HashMap<String, Object> row = new HashMap<String, Object>();
-                for (String key : document.keySet()) {
-                    row.put(key, document.get(key));
-                    if (!headers.contains(key)) {
-                        headers.add(key);
-                    }
-                }
-            }
-            rows.add((HashMap<String, Object>) row.clone());
-        }
-        int i = 0, j = 0;
-        Object[][] data = new Object[rows.size()][headers.size()];
-        for (HashMap<String, Object> r : rows) {
-            
-            for (String key : headers) {
-                if(j == 0){
-                    data[i][0] = i+1;
+            for (Object key : documentVersions.getHeaders()) {
+                if (j == 0) {
+                    data[size - i - 1][0] = (i + 1);
                     j++;
                     continue;
                 }
                 if (r.containsKey(key)) {
-                    data[i][j] = r.get(key);
+                    data[size - i - 1][j] = r.get(key);
                 } else {
-                    data[i][j] = "";
+                    data[size - i - 1][j] = "";
                 }
 
                 j++;
@@ -626,11 +670,11 @@ public class JFrameMain extends javax.swing.JFrame {
             i++;
             j = 0;
         }
-        
-        jTableDocumentVersions.setModel(new DefaultTableModel(data, headers.toArray()));
+
+        jTableDocumentVersions.setModel(new DefaultTableModel(data, documentVersions.getHeaders().toArray()));
     }
 
-    private void populateCollectionLog(String database, String collection) {
+    private void populateCollectionLog(String database, String collection, String filter) {
 
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setFont(renderer.getFont().deriveFont(Font.BOLD));
@@ -651,8 +695,12 @@ public class JFrameMain extends javax.swing.JFrame {
             line[2] = logEntry.get(columns[2]).toString();
             line[3] = logEntry.get(columns[3]).toString();
             line[4] = logEntry.get(columns[4]).toString();
-
-            dataList.add(line);
+            if (line[1].toString().contains(filter)
+                    || line[2].toString().contains(filter)
+                    || line[3].toString().contains(filter)
+                    || line[4].toString().contains(filter)) {
+                dataList.add(line);
+            }
 
         }
 
