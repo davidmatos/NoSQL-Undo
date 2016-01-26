@@ -13,8 +13,8 @@ import java.util.ArrayList;
  */
 public class MongoRecoveryUndo extends MongoRecovery{
     
-    public MongoRecoveryUndo(ArrayList<OpLog> opLogsToRemove) {
-        super(opLogsToRemove);
+    public MongoRecoveryUndo(ArrayList<OpLog> opLogsToRemove, String database) {
+        super(opLogsToRemove, database);
     }
 
     @Override

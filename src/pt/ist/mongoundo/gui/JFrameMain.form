@@ -353,6 +353,9 @@
               </Layout>
               <SubComponents>
                 <Container class="javax.swing.JSplitPane" name="jSplitPane3">
+                  <Properties>
+                    <Property name="orientation" type="int" value="0"/>
+                  </Properties>
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
                   <SubComponents>
@@ -389,6 +392,7 @@
                                           <Component id="btnRecoverSelective" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabelRecoveryMessage" alignment="0" min="-2" pref="291" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
@@ -417,7 +421,9 @@
                                       <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="lblO" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace pref="702" max="32767" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="jLabelRecoveryMessage" pref="484" max="32767" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="btnRecoverSelective" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnRecoverUndo" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -429,9 +435,12 @@
                       <SubComponents>
                         <Component class="javax.swing.JButton" name="btnRecoverSelective">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Selective Recovery"/>
+                            <Property name="text" type="java.lang.String" value="Full Recovery"/>
                             <Property name="toolTipText" type="java.lang.String" value=""/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRecoverSelectiveActionPerformed"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="btnRecoverUndo">
                           <Properties>
@@ -466,6 +475,11 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="lblO">
                         </Component>
+                        <Component class="javax.swing.JLabel" name="jLabelRecoveryMessage">
+                          <Properties>
+                            <Property name="verticalAlignment" type="int" value="1"/>
+                          </Properties>
+                        </Component>
                       </SubComponents>
                     </Container>
                     <Container class="javax.swing.JPanel" name="jPanel4">
@@ -478,7 +492,7 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane3" pref="563" max="32767" attributes="0"/>
+                              <Component id="jScrollPane3" pref="0" max="32767" attributes="0"/>
                               <Component id="jLabel8" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
@@ -499,7 +513,8 @@
                                       <Component id="jTextFieldSearch" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jScrollPane3" pref="314" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane3" min="-2" pref="236" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>

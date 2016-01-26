@@ -21,6 +21,7 @@ public class MongoUndoUtils {
 
         DocumentVersions documentVersions = new DocumentVersions();
 
+        //Search all opLogs entries that affected this currentVersion
         String ns = database + "." + collection;
         ObjectId id = new ObjectId(_id);
         HashMap<String, Object> whereMap = new HashMap<>();
@@ -40,59 +41,73 @@ public class MongoUndoUtils {
                 getDatabase(MongoUndoConstants.LOCAL_DB).
                 getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where).sort(new Document("ts", 1));
 
+        //Let's start the construction of every version
         documentVersions.addHeader("Version");
-
-        HashMap<String, Object> row = new HashMap<>();
+        Document currentVersion = new Document();
+        
         for (Document logEntry : logEntries) {
-            //System.out.println("LOG ENTREYYYYYYYYYYYYY_______-------_______------_");
-            Document document = (Document) logEntry.get("o");
+            HashMap<String, Object> row = new HashMap<>();
 
             if (logEntry.get("op").equals("i")) {
                 //insert operation
-                documentVersions.setFullReconstruction(true);
+                currentVersion = (Document) logEntry.get("o");
             } else if (logEntry.get("op").equals("u")) {
                 //update operation
-                document = (Document) document.get("$set");
+                //document = (Document) currentVersion.get("$set");
+                if (((Document)logEntry.get("o")).containsKey("$set")) {
+                    Document updateSet = (Document) ((Document)logEntry.get("o")).get("$set");
+                    for (String key : updateSet.keySet()) {
+                        currentVersion.put(key, updateSet.get(key));
+                        documentVersions.addHeader(key);
+                    }
+                } else {
+                    currentVersion = (Document) logEntry.get("o");
+                }
+                
+                Document updateSet = (Document) logEntry.get("o2");
+                for (String key : updateSet.keySet()) {
+                    currentVersion.put(key, updateSet.get(key));
+                    documentVersions.addHeader(key);
+                }
+            
 
             } else if (logEntry.get("op").equals("d")) {
                 //delete operation
-                documentVersions.setDeleted(true);
+                //currentVersion = new Document();
+               // currentVersion.put("_deleted", true);
+//                for (String key : currentVersion.keySet()) {
+//                    currentVersion.remove(key);
+//                }
+                   documentVersions.addRow(new HashMap<String, Object>());
+                   continue;
             }
-            if (document != null) {
-                for (String key : document.keySet()) {
-                    row.put(key, document.get(key));
-                    documentVersions.addHeader(key);
 
-                }
+            
+            for (String key : currentVersion.keySet()) {
+                row.put(key, currentVersion.get(key));
+                documentVersions.addHeader(key);
+
             }
-            if (logEntry.containsKey("o2")) {
-                document = (Document) logEntry.get("o2");
-                for (String key : document.keySet()) {
-                    row.put(key, document.get(key));
-                    documentVersions.addHeader(key);
-                }
-            }
+            
             documentVersions.addRow((HashMap<String, Object>) row.clone());
 
         }
 
-        if (!documentVersions.isFullReconstruction() && !documentVersions.isDeleted()) {
-            FindIterable<Document> documentIT = MongoUndo.mongoClient.getDatabase(database).getCollection(collection).find(new Document("_id", new ObjectId(_id)));
-            //tenho de completar o doc
-            Document document = documentIT.first();
-            for (int i = documentVersions.getRows().size() - 1; i >= 0; i--) {
-                HashMap<String, Object> r = documentVersions.getRows().get(i);
-                r.keySet().stream().forEach((key) -> {
-                    document.remove(key);
-                });
-                document.keySet().stream().forEach((key) -> {
-                    r.put(key, document.get(key));
-                });
-
-            }
-        }
-
-
+//        if (!documentVersions.isFullReconstruction() && !documentVersions.isDeleted()) {
+//            FindIterable<Document> documentIT = MongoUndo.mongoClient.getDatabase(database).getCollection(collection).find(new Document("_id", new ObjectId(_id)));
+//            //tenho de completar o doc
+//            Document currentVersion = documentIT.first();
+//            for (int i = documentVersions.getRows().size() - 1; i >= 0; i--) {
+//                HashMap<String, Object> r = documentVersions.getRows().get(i);
+//                r.keySet().stream().forEach((key) -> {
+//                    currentVersion.remove(key);
+//                });
+//                currentVersion.keySet().stream().forEach((key) -> {
+//                    r.put(key, currentVersion.get(key));
+//                });
+//
+//            }
+//        }
         return documentVersions;
     }
 }

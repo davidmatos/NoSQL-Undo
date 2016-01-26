@@ -11,8 +11,6 @@ package pt.ist.mongoundo.recovery;
  */
 public class RecoveryUtils {
     
-    public static void cenas(){
-        String query = "db.oplog.$main.find({ \"o._id\":  ObjectId(\"566ff5cd31224f9fbac0bea4\")})";
-    }
+
     
 }

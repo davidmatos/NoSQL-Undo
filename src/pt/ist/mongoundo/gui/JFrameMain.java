@@ -5,7 +5,6 @@
  */
 package pt.ist.mongoundo.gui;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
@@ -13,23 +12,20 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.basic.BasicListUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import org.bson.BsonTimestamp;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import pt.ist.mongoundo.DocumentVersions;
@@ -37,6 +33,9 @@ import pt.ist.mongoundo.DocumentVersions;
 import pt.ist.mongoundo.MongoUndo;
 import pt.ist.mongoundo.MongoUndoConstants;
 import pt.ist.mongoundo.MongoUndoUtils;
+import pt.ist.mongoundo.recovery.MongoRecoveryFull;
+import pt.ist.mongoundo.recovery.OpLog;
+import pt.ist.mongoundo.recovery.OpLogUtils;
 
 /**
  *
@@ -94,6 +93,7 @@ public class JFrameMain extends javax.swing.JFrame {
         lblOp = new javax.swing.JLabel();
         lblNs = new javax.swing.JLabel();
         lblO = new javax.swing.JLabel();
+        jLabelRecoveryMessage = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -243,8 +243,15 @@ public class JFrameMain extends javax.swing.JFrame {
 
         tabMain.addTab("Documents", pnlDocuments);
 
-        btnRecoverSelective.setText("Selective Recovery");
+        jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        btnRecoverSelective.setText("Full Recovery");
         btnRecoverSelective.setToolTipText("");
+        btnRecoverSelective.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecoverSelectiveActionPerformed(evt);
+            }
+        });
 
         btnRecoverUndo.setText("Undo Recovery");
 
@@ -255,6 +262,8 @@ public class JFrameMain extends javax.swing.JFrame {
         jLabel3.setText("ns");
 
         jLabel4.setText("o");
+
+        jLabelRecoveryMessage.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         javax.swing.GroupLayout pnlRecoverActionsLayout = new javax.swing.GroupLayout(pnlRecoverActions);
         pnlRecoverActions.setLayout(pnlRecoverActionsLayout);
@@ -278,7 +287,8 @@ public class JFrameMain extends javax.swing.JFrame {
                         .addComponent(btnRecoverUndo)
                         .addGap(67, 67, 67)
                         .addComponent(btnRecoverSelective))
-                    .addComponent(jLabel4))
+                    .addComponent(jLabel4)
+                    .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         pnlRecoverActionsLayout.setVerticalGroup(
@@ -300,7 +310,9 @@ public class JFrameMain extends javax.swing.JFrame {
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(lblO))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 702, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRecoverSelective)
                     .addComponent(btnRecoverUndo)))
@@ -340,7 +352,7 @@ public class JFrameMain extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
@@ -358,7 +370,8 @@ public class JFrameMain extends javax.swing.JFrame {
                     .addComponent(jLabel9)
                     .addComponent(jTextFieldSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jSplitPane3.setLeftComponent(jPanel4);
@@ -446,6 +459,9 @@ public class JFrameMain extends javax.swing.JFrame {
 
     private void treeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        if (node == null){
+            return;
+        }
         populateDocuments(node.getParent().toString(), node.toString());
         populateCollectionLog(node.getParent().toString(), node.toString(), "");
 
@@ -461,6 +477,10 @@ public class JFrameMain extends javax.swing.JFrame {
         populateCollectionLog(node.getParent().toString(), node.toString(), jTextFieldSearch.getText());
     }//GEN-LAST:event_jTextFieldSearchKeyTyped
 
+    private void btnRecoverSelectiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecoverSelectiveActionPerformed
+        fullRecovery();
+    }//GEN-LAST:event_btnRecoverSelectiveActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRecoverSelective;
@@ -474,6 +494,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelRecoveryMessage;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBarMain;
@@ -679,26 +700,22 @@ public class JFrameMain extends javax.swing.JFrame {
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setFont(renderer.getFont().deriveFont(Font.BOLD));
 
-        String[] columns = new String[]{"undo", "ts", "op", "ns", "o"};
+        String[] columns = new String[]{"undo", "ts", "op", "ns", "o", "o2"};
 
         ArrayList<Object[]> dataList = new ArrayList<Object[]>();
 
         tblLog.removeAll();
 
-        FindIterable<Document> it = MongoUndo.mongoClient.getDatabase("local").getCollection("oplog.$main")
-                .find(new Document("ns", database + "." + collection));
+        ArrayList<OpLog> opLogs = OpLogUtils.getCollectionOplogs(database, collection);
 
-        for (Document logEntry : it) {
-            Object[] line = new Object[5];
-            line[0] = false;
-            line[1] = logEntry.get(columns[1]).toString();
-            line[2] = logEntry.get(columns[2]).toString();
-            line[3] = logEntry.get(columns[3]).toString();
-            line[4] = logEntry.get(columns[4]).toString();
+        for (OpLog opLog : opLogs) {
+            Object[] line = opLog.getRow();
+            
             if (line[1].toString().contains(filter)
                     || line[2].toString().contains(filter)
                     || line[3].toString().contains(filter)
-                    || line[4].toString().contains(filter)) {
+                    || line[4].toString().contains(filter)
+                    || line[5].toString().contains(filter)) {
                 dataList.add(line);
             }
 
@@ -764,4 +781,31 @@ public class JFrameMain extends javax.swing.JFrame {
         }
     }
 
+    
+    private void fullRecovery(){
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        String database = node.getParent().toString();
+        ArrayList<OpLog> opLogsToRemove = new ArrayList<>();
+        TableModel model = tblLog.getModel();
+        for(int i = 0; i < model.getRowCount(); i++){
+            if((boolean)model.getValueAt(i, 0)){
+                OpLog opLog = new OpLog((BsonTimestamp)model.getValueAt(i, 1), 
+                        (char)model.getValueAt(i, 2), (String)model.getValueAt(i, 3), 
+                        (Document)model.getValueAt(i, 4));
+                if(!model.getValueAt(i, 5).toString().equals("")){
+                 opLog.setO2((Document)model.getValueAt(i, 5));
+                }
+                opLogsToRemove.add(opLog);
+            }
+        }
+        MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToRemove, database);
+        mongoRecoveryFull.recover();
+    }
+    
+    private String recoveryProgress = "";
+    public void addRecoveryProgressMessage(String message){
+        recoveryProgress += "<br>" + message;
+        
+        jLabelRecoveryMessage.setText("<html>"+recoveryProgress+"</html>");
+    }
 }

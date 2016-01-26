@@ -15,20 +15,14 @@ import java.util.HashMap;
 public class DocumentVersions {
     private ArrayList<HashMap<String, Object>> rows;
     private ArrayList<String> headers;
-    private boolean fullReconstruction;
-    private boolean deleted;
 
     public DocumentVersions() {
         this.rows = new ArrayList<>();
         this.headers = new ArrayList<> ();
-        this.fullReconstruction = false;
-        this.deleted = false;
     }
-    public DocumentVersions(ArrayList<HashMap<String, Object>> rows, ArrayList<String> headers, boolean fullReconstruction, boolean deleted) {
+    public DocumentVersions(ArrayList<HashMap<String, Object>> rows, ArrayList<String> headers, boolean deleted) {
         this.rows = rows;
         this.headers = headers;
-        this.fullReconstruction = fullReconstruction;
-        this.deleted = deleted;
     }
 
     public ArrayList<HashMap<String, Object>> getRows() {
@@ -47,21 +41,6 @@ public class DocumentVersions {
         this.headers = headers;
     }
 
-    public boolean isFullReconstruction() {
-        return fullReconstruction;
-    }
-
-    public void setFullReconstruction(boolean fullReconstruction) {
-        this.fullReconstruction = fullReconstruction;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
     
     public void addHeader(String newHeader){
         if(!this.headers.contains(newHeader)){
@@ -70,7 +49,12 @@ public class DocumentVersions {
     }
     
     public void addRow(HashMap<String, Object> newRow){
-        this.rows.add(newRow);
+        if(newRow.containsKey("_deleted")){
+            this.rows.add(new HashMap<String, Object>());
+        }else{
+            this.rows.add(newRow);
+        }
+        
         System.out.println("Adicionei row, agora tenho : " + this.rows.size());
     }
     

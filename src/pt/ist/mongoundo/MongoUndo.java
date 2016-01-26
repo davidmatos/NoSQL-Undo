@@ -17,7 +17,6 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 import com.mongodb.MongoClient;
-import javax.swing.JSplitPane;
 import pt.ist.mongoundo.gui.JFrameMain;
 
 public class MongoUndo {
@@ -28,7 +27,7 @@ public class MongoUndo {
 
     
 
-    private static JFrameMain jFrameMain;
+    public static JFrameMain jFrameMain;
 
     /**
      * @param args the command line arguments

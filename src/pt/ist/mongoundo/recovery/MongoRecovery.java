@@ -14,9 +14,11 @@ import java.util.ArrayList;
 public abstract class MongoRecovery {
     
     private ArrayList<OpLog> opLogsToRemove;
+    private String database;
 
-    public MongoRecovery(ArrayList<OpLog> opLogsToRemove) {
+    public MongoRecovery(ArrayList<OpLog> opLogsToRemove, String database) {
         this.opLogsToRemove = opLogsToRemove;
+        this.database = database;
     }
 
     public ArrayList<OpLog> getOpLogsToRemove() {
@@ -25,6 +27,14 @@ public abstract class MongoRecovery {
 
     public void setOpLogsToRemove(ArrayList<OpLog> opLogsToRemove) {
         this.opLogsToRemove = opLogsToRemove;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
     }
     
     
