@@ -342,7 +342,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jSplitPane3" alignment="0" pref="494" max="32767" attributes="0"/>
+                      <Component id="jSplitPane3" alignment="0" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -392,9 +392,13 @@
                                           <Component id="btnRecoverSelective" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabelRecoveryMessage" alignment="0" min="-2" pref="291" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="jPanel5" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="32767" attributes="0"/>
+                                          <Component id="jLabelRecoveryMessage" min="-2" pref="291" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="-2" pref="93" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -422,8 +426,11 @@
                                       <Component id="lblO" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="jLabelRecoveryMessage" pref="484" max="32767" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jLabelRecoveryMessage" pref="490" max="32767" attributes="0"/>
+                                      <Component id="jPanel5" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="btnRecoverSelective" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnRecoverUndo" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -480,6 +487,48 @@
                             <Property name="verticalAlignment" type="int" value="1"/>
                           </Properties>
                         </Component>
+                        <Container class="javax.swing.JPanel" name="jPanel5">
+
+                          <Layout>
+                            <DimensionLayout dim="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="jProgressBarRecovery" pref="388" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="jLabelCurrentOperation" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="jLabelTitle" alignment="0" max="32767" attributes="0"/>
+                              </Group>
+                            </DimensionLayout>
+                            <DimensionLayout dim="1">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="jLabelTitle" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
+                                      <Component id="jLabelCurrentOperation" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="jProgressBarRecovery" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace pref="400" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                            </DimensionLayout>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JProgressBar" name="jProgressBarRecovery">
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabelCurrentOperation">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Current Operation"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabelTitle">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Recovery Progress"/>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
                       </SubComponents>
                     </Container>
                     <Container class="javax.swing.JPanel" name="jPanel4">

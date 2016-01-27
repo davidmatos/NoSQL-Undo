@@ -94,6 +94,10 @@ public class JFrameMain extends javax.swing.JFrame {
         lblNs = new javax.swing.JLabel();
         lblO = new javax.swing.JLabel();
         jLabelRecoveryMessage = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jProgressBarRecovery = new javax.swing.JProgressBar();
+        jLabelCurrentOperation = new javax.swing.JLabel();
+        jLabelTitle = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -265,6 +269,32 @@ public class JFrameMain extends javax.swing.JFrame {
 
         jLabelRecoveryMessage.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
+        jLabelCurrentOperation.setText("Current Operation");
+
+        jLabelTitle.setText("Recovery Progress");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jProgressBarRecovery, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addContainerGap())
+            .addComponent(jLabelCurrentOperation, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabelTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jLabelTitle)
+                .addGap(32, 32, 32)
+                .addComponent(jLabelCurrentOperation)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jProgressBarRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(400, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout pnlRecoverActionsLayout = new javax.swing.GroupLayout(pnlRecoverActions);
         pnlRecoverActions.setLayout(pnlRecoverActionsLayout);
         pnlRecoverActionsLayout.setHorizontalGroup(
@@ -288,8 +318,11 @@ public class JFrameMain extends javax.swing.JFrame {
                         .addGap(67, 67, 67)
                         .addComponent(btnRecoverSelective))
                     .addComponent(jLabel4)
-                    .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
+                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(93, 93, 93))
         );
         pnlRecoverActionsLayout.setVerticalGroup(
             pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -311,8 +344,10 @@ public class JFrameMain extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(lblO))
                 .addGap(18, 18, 18)
-                .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRecoverSelective)
                     .addComponent(btnRecoverUndo)))
@@ -380,7 +415,7 @@ public class JFrameMain extends javax.swing.JFrame {
         pnlLog.setLayout(pnlLogLayout);
         pnlLogLayout.setHorizontalGroup(
             pnlLogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
+            .addComponent(jSplitPane3)
         );
         pnlLogLayout.setVerticalGroup(
             pnlLogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -432,7 +467,7 @@ public class JFrameMain extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPaneMain, javax.swing.GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
+            .addComponent(jSplitPaneMain, javax.swing.GroupLayout.PREFERRED_SIZE, 628, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -459,7 +494,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
     private void treeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-        if (node == null){
+        if (node == null) {
             return;
         }
         populateDocuments(node.getParent().toString(), node.toString());
@@ -478,6 +513,7 @@ public class JFrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldSearchKeyTyped
 
     private void btnRecoverSelectiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecoverSelectiveActionPerformed
+
         fullRecovery();
     }//GEN-LAST:event_btnRecoverSelectiveActionPerformed
 
@@ -494,7 +530,9 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelCurrentOperation;
     private javax.swing.JLabel jLabelRecoveryMessage;
+    private javax.swing.JLabel jLabelTitle;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBarMain;
@@ -505,6 +543,8 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JProgressBar jProgressBarRecovery;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -538,6 +578,7 @@ public class JFrameMain extends javax.swing.JFrame {
     }
 
     public void populateTree() {
+        tree.removeAll();
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         ((DefaultMutableTreeNode) model.getRoot()).removeAllChildren();
 
@@ -578,7 +619,12 @@ public class JFrameMain extends javax.swing.JFrame {
                 if (!headers.contains(key)) {
                     headers.add(key);
                 }
-                row.put(key, document.get(key).toString());
+                if(document.get(key) != null){
+                    row.put(key, document.get(key).toString());
+                }else{
+                    row.put(key, null);
+                }
+                
             }
             rows.add(row);
         }
@@ -609,8 +655,6 @@ public class JFrameMain extends javax.swing.JFrame {
         jTableDocuments.setModel(defaultTableModel);
         jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
     }
-
- 
 
     private void populateDocumentLog(String database, String collection, String _id) {
         jTableDocumentLog.removeAll();
@@ -710,7 +754,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
         for (OpLog opLog : opLogs) {
             Object[] line = opLog.getRow();
-            
+
             if (line[1].toString().contains(filter)
                     || line[2].toString().contains(filter)
                     || line[3].toString().contains(filter)
@@ -781,31 +825,54 @@ public class JFrameMain extends javax.swing.JFrame {
         }
     }
 
-    
-    private void fullRecovery(){
+    private void fullRecovery() {
+        
+       
+        
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         String database = node.getParent().toString();
         ArrayList<OpLog> opLogsToRemove = new ArrayList<>();
         TableModel model = tblLog.getModel();
-        for(int i = 0; i < model.getRowCount(); i++){
-            if((boolean)model.getValueAt(i, 0)){
-                OpLog opLog = new OpLog((BsonTimestamp)model.getValueAt(i, 1), 
-                        (char)model.getValueAt(i, 2), (String)model.getValueAt(i, 3), 
-                        (Document)model.getValueAt(i, 4));
-                if(!model.getValueAt(i, 5).toString().equals("")){
-                 opLog.setO2((Document)model.getValueAt(i, 5));
+        for (int i = 0; i < model.getRowCount(); i++) {
+            if ((boolean) model.getValueAt(i, 0)) {
+                OpLog opLog = new OpLog((BsonTimestamp) model.getValueAt(i, 1),
+                        (char) model.getValueAt(i, 2), (String) model.getValueAt(i, 3),
+                        (Document) model.getValueAt(i, 4));
+                if (!model.getValueAt(i, 5).toString().equals("")) {
+                    opLog.setO2((Document) model.getValueAt(i, 5));
                 }
                 opLogsToRemove.add(opLog);
             }
         }
+
+        
+        
         MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToRemove, database);
+        
+         
         mongoRecoveryFull.recover();
     }
-    
+
     private String recoveryProgress = "";
-    public void addRecoveryProgressMessage(String message){
+
+    public void addRecoveryProgressMessage(String message) {
         recoveryProgress += "<br>" + message;
-        
-        jLabelRecoveryMessage.setText("<html>"+recoveryProgress+"</html>");
+
+        jLabelRecoveryMessage.setText("<html>" + recoveryProgress + "</html>");
     }
+    
+    
+     public void setNrOperations(int n){
+        jProgressBarRecovery.setMaximum(n);
+    }
+     
+     public void setCurrentOperation(String operation){
+         jProgressBarRecovery.setValue(jProgressBarRecovery.getValue() + 1 );
+         if(jProgressBarRecovery.getValue() >= jProgressBarRecovery.getMaximum()){
+             jLabelCurrentOperation.setText("Recovery process successfully completed ");
+         }else{
+             jLabelCurrentOperation.setText(operation);
+         }
+         
+     }
 }

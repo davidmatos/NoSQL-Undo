@@ -9,6 +9,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.BsonTimestamp;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import pt.ist.mongoundo.MongoUndo;
 
 /**
@@ -92,7 +93,7 @@ public class OpLog {
         return result;
     }
 
-    public void execute() {
+    public void execute(String databaseName) {
         if (!ns.contains(".")) {
             return;
         }
@@ -108,13 +109,18 @@ public class OpLog {
 
             return;
         }
-        MongoDatabase database = MongoUndo.mongoClient.getDatabase(ns.split("\\.")[0]);
+        MongoDatabase database = MongoUndo.mongoClient.getDatabase(databaseName);
 
         MongoCollection collection = database.getCollection(ns.split("\\.")[1]);
         switch (this.op) {
             case 'i':
+                
+                if(collection.find(new Document("_id", this.getO().get("_id"))).first() == null){
                 collection.insertOne(this.o);
                 System.out.println("Inserted document");
+                }
+                
+                
                 break;
             case 'u':
                 this.o.remove("_id");
@@ -143,5 +149,25 @@ public class OpLog {
                 break;
         }
     }
+
+    @Override
+    public String toString() {
+        String result = "Operation ";
+        if(op == 'i'){
+            result += "insert ";
+        }
+        if(op == 'u'){
+            result += "update ";
+        }
+        if(op == 'd'){
+            result += "delete ";
+        }
+        
+        result += "in coollection " + ns.split("\\.")[1];
+            
+        return result;
+    }
+    
+    
 
 }

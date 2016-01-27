@@ -15,6 +15,7 @@ public abstract class MongoRecovery {
     
     private ArrayList<OpLog> opLogsToRemove;
     private String database;
+    
 
     public MongoRecovery(ArrayList<OpLog> opLogsToRemove, String database) {
         this.opLogsToRemove = opLogsToRemove;
@@ -39,6 +40,8 @@ public abstract class MongoRecovery {
     
     
     public abstract void recover();
+
+ 
     
     
 }
