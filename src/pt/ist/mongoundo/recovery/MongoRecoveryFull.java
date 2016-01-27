@@ -23,7 +23,7 @@ public class MongoRecoveryFull extends MongoRecovery {
 
     @Override
     public void recover() {
-        
+        MongoUndo.jFrameMain.disableRecoveryButtons();
         System.out.println("=============================================RECOVERY=============================================");
         
 
@@ -59,6 +59,8 @@ public class MongoRecoveryFull extends MongoRecovery {
 //        jDialogRecoveryProgress.setCurrentOperation("Finished recovering");
         System.out.println("Finished recovering");
          MongoUndo.jFrameMain.populateTree();
+         
+         MongoUndo.jFrameMain.enableRecoveryButtons();
     }
 
   

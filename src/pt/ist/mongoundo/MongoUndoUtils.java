@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import pt.ist.mongoundo.recovery.RecoveryUtils;
 
 /**
  *
@@ -21,25 +22,8 @@ public class MongoUndoUtils {
 
         DocumentVersions documentVersions = new DocumentVersions();
 
-        //Search all opLogs entries that affected this currentVersion
-        String ns = database + "." + collection;
-        ObjectId id = new ObjectId(_id);
-        HashMap<String, Object> whereMap = new HashMap<>();
-
-        whereMap.put("ns", ns);
-
-        Document o = new Document("o._id", id);
-        Document o2 = new Document("o2._id", id);
-
-        ArrayList<Document> oArray = new ArrayList<>();
-        oArray.add(o);
-        oArray.add(o2);
-        whereMap.put("$or", oArray);
-
-        Document where = new Document(whereMap);
-        FindIterable<Document> logEntries = MongoUndo.mongoClient.
-                getDatabase(MongoUndoConstants.LOCAL_DB).
-                getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where).sort(new Document("ts", 1));
+       
+        FindIterable<Document> logEntries = RecoveryUtils.getDocumentLogEntries(database, collection, _id);
 
         //Let's start the construction of every version
         documentVersions.addHeader("Version");

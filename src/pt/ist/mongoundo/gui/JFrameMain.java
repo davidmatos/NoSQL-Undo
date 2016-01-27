@@ -36,6 +36,7 @@ import pt.ist.mongoundo.MongoUndoUtils;
 import pt.ist.mongoundo.recovery.MongoRecoveryFull;
 import pt.ist.mongoundo.recovery.OpLog;
 import pt.ist.mongoundo.recovery.OpLogUtils;
+import pt.ist.mongoundo.recovery.RecoveryUtils;
 
 /**
  *
@@ -49,7 +50,7 @@ public class JFrameMain extends javax.swing.JFrame {
     public JFrameMain() {
         initComponents();
         hideScreen();
-
+        initDocumentsTable();
     }
 
     /**
@@ -497,6 +498,9 @@ public class JFrameMain extends javax.swing.JFrame {
         if (node == null) {
             return;
         }
+        if (node.getParent() == null) {
+            return;
+        }
         populateDocuments(node.getParent().toString(), node.toString());
         populateCollectionLog(node.getParent().toString(), node.toString(), "");
 
@@ -571,6 +575,10 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JTree tree;
     // End of variables declaration//GEN-END:variables
 
+    private String selectedDatabase = "";
+    private String selectedCollection = "";
+    private String selectedId = "";
+
     private void hideScreen() {
         this.tree.removeAll();
         this.jTableDocuments.removeAll();
@@ -606,25 +614,25 @@ public class JFrameMain extends javax.swing.JFrame {
     }
 
     private void populateDocuments(String databaseName, String collectionName) {
-        jTableDocuments.removeAll();
+//        jTableDocuments.removeAll();
 
-        ArrayList<String> headers = new ArrayList<String>();
+        ArrayList<String> headers = new ArrayList<>();
 
         MongoDatabase database = MongoUndo.mongoClient.getDatabase(databaseName);
         FindIterable<Document> documents = database.getCollection(collectionName).find();
-        ArrayList<HashMap<String, String>> rows = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String, String>> rows = new ArrayList<>();
         for (Document document : documents) {
-            HashMap<String, String> row = new HashMap<String, String>();
+            HashMap<String, String> row = new HashMap<>();
             for (String key : document.keySet()) {
                 if (!headers.contains(key)) {
                     headers.add(key);
                 }
-                if(document.get(key) != null){
+                if (document.get(key) != null) {
                     row.put(key, document.get(key).toString());
-                }else{
+                } else {
                     row.put(key, null);
                 }
-                
+
             }
             rows.add(row);
         }
@@ -637,53 +645,41 @@ public class JFrameMain extends javax.swing.JFrame {
 
             }
         }
-
-        DefaultTableModel defaultTableModel = new DefaultTableModel(data, headers.toArray());
-        ListSelectionListener listSelectionListener = new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (jTableDocuments.getSelectedRow() < 0) {
-                    return;
-                }
-                int index = jTableDocuments.getSelectedRow();
-                Object _id = jTableDocuments.getValueAt(index, 0);
-                populateDocumentLog(databaseName, collectionName, _id.toString());
-
-            }
-        };
-
+         DefaultTableModel defaultTableModel = new DefaultTableModel(data, headers.toArray());
         jTableDocuments.setModel(defaultTableModel);
-        jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
+
+//        DefaultTableModel defaultTableModel = new DefaultTableModel(data, headers.toArray());
+//        ListSelectionListener listSelectionListener = (ListSelectionEvent e) -> {
+//            if (e.getValueIsAdjusting()) {
+//                return;
+//            }
+//
+//            if (jTableDocuments.getSelectedRow() < 0) {
+//                return;
+//            }
+//
+//            int index = jTableDocuments.getSelectedRow();
+//
+//            Object _id = jTableDocuments.getValueAt(index, 0);
+//            populateDocumentLog(databaseName, collectionName, _id.toString());
+//        };
+
+//        jTableDocuments.setModel(defaultTableModel);
+//        jTableDocuments.getSelectionModel().
+//        jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
+
     }
 
     private void populateDocumentLog(String database, String collection, String _id) {
+        System.out.println("DB=" + database + " Collection=" + collection + " _id=" + _id);
         jTableDocumentLog.removeAll();
 
-        String ns = database + "." + collection;
-        ObjectId id = new ObjectId(_id);
-        System.out.println("Selected=" + _id + " from ns=" + ns);
-        HashMap<String, Object> whereMap = new HashMap<String, Object>();
-
-        whereMap.put("ns", ns);
-
-        Document o = new Document("o._id", id);
-        Document o2 = new Document("o2._id", id);
-
-        ArrayList<Document> oArray = new ArrayList<Document>();
-        oArray.add(o);
-        oArray.add(o2);
-        whereMap.put("$or", oArray);
-
-        Document where = new Document(whereMap);
-
-        FindIterable<Document> itLogEntries = MongoUndo.mongoClient.
-                getDatabase(MongoUndoConstants.LOCAL_DB).
-                getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where).sort(new Document("ts", -1));
+        FindIterable<Document> itLogEntries = RecoveryUtils.getDocumentLogEntries(database, collection, _id);
         populateDocumentVersions(database, collection, _id);
         String[] headers = new String[]{"ts", "op", "ns", "o"};
         ArrayList<String[]> rows = new ArrayList<String[]>();
         for (Document logEntry : itLogEntries) {
-            System.out.println("LogEntry:" + logEntry.toString());
+
             rows.add(new String[]{
                 logEntry.get(headers[0]).toString(),
                 logEntry.get(headers[1]).toString(),
@@ -695,6 +691,7 @@ public class JFrameMain extends javax.swing.JFrame {
         for (int i = 0; i < rows.size(); i++) {
             data[i] = rows.get(i);
         }
+
         jTableDocumentLog.setModel(new DefaultTableModel(data, headers));
         ListSelectionListener listSelectionListener = new ListSelectionListener() {
             @Override
@@ -711,6 +708,13 @@ public class JFrameMain extends javax.swing.JFrame {
     }
 
     private void populateDocumentVersions(String database, String collection, String _id) {
+        if (database.equals(selectedDatabase) && collection.equals(selectedCollection)
+                && _id.equals(selectedId)) {
+            return;
+        }
+        selectedDatabase = database;
+        selectedCollection = collection;
+        selectedId = _id;
         jTableDocumentVersions.removeAll();
 
         DocumentVersions documentVersions = MongoUndoUtils.getDocumentVersions(database, collection, _id);
@@ -718,7 +722,7 @@ public class JFrameMain extends javax.swing.JFrame {
         Object[][] data = new Object[documentVersions.getRows().size()][documentVersions.getHeaders().size()];
         for (HashMap<String, Object> r : documentVersions.getRows()) {
 
-            for (Object key : documentVersions.getHeaders()) {
+            for (String key : documentVersions.getHeaders()) {
                 if (j == 0) {
                     data[size - i - 1][0] = (i + 1);
                     j++;
@@ -826,9 +830,7 @@ public class JFrameMain extends javax.swing.JFrame {
     }
 
     private void fullRecovery() {
-        
-       
-        
+
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         String database = node.getParent().toString();
         ArrayList<OpLog> opLogsToRemove = new ArrayList<>();
@@ -845,11 +847,8 @@ public class JFrameMain extends javax.swing.JFrame {
             }
         }
 
-        
-        
         MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToRemove, database);
-        
-         
+
         mongoRecoveryFull.recover();
     }
 
@@ -860,19 +859,65 @@ public class JFrameMain extends javax.swing.JFrame {
 
         jLabelRecoveryMessage.setText("<html>" + recoveryProgress + "</html>");
     }
-    
-    
-     public void setNrOperations(int n){
+
+    public void setNrOperations(int n) {
         jProgressBarRecovery.setMaximum(n);
     }
-     
-     public void setCurrentOperation(String operation){
-         jProgressBarRecovery.setValue(jProgressBarRecovery.getValue() + 1 );
-         if(jProgressBarRecovery.getValue() >= jProgressBarRecovery.getMaximum()){
-             jLabelCurrentOperation.setText("Recovery process successfully completed ");
-         }else{
-             jLabelCurrentOperation.setText(operation);
-         }
-         
-     }
+
+    public void setCurrentOperation(String operation) {
+        jProgressBarRecovery.setValue(jProgressBarRecovery.getValue() + 1);
+        if (jProgressBarRecovery.getValue() >= jProgressBarRecovery.getMaximum()) {
+            jLabelCurrentOperation.setText("Recovery process successfully completed ");
+        } else {
+            jLabelCurrentOperation.setText(operation);
+        }
+
+    }
+
+    public void disableRecoveryButtons() {
+        btnRecoverUndo.setEnabled(false);
+        btnRecoverSelective.setEnabled(false);
+    }
+
+    public void enableRecoveryButtons() {
+        btnRecoverUndo.setEnabled(true);
+        btnRecoverSelective.setEnabled(true);
+    }
+
+    public void initDocumentsTable() {
+        
+        
+        
+
+        DefaultTableModel defaultTableModel = new DefaultTableModel(new Object[3][3], new Object[3]);
+        ListSelectionListener listSelectionListener = (ListSelectionEvent e) -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        if (node == null) {
+            return;
+        }
+        if (node.getParent() == null) {
+            return;
+        }
+            String databaseName = node.getParent().toString();
+            String collectionName = node.toString();
+            
+            if (e.getValueIsAdjusting()) {
+                return;
+            }
+
+            if (jTableDocuments.getSelectedRow() < 0) {
+                return;
+            }
+
+            int index = jTableDocuments.getSelectedRow();
+
+            Object _id = jTableDocuments.getValueAt(index, 0);
+            populateDocumentLog(databaseName, collectionName, _id.toString());
+        };
+
+        jTableDocuments.setModel(defaultTableModel);
+//        jTableDocuments.getSelectionModel().
+        jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
+    }
+
 }
