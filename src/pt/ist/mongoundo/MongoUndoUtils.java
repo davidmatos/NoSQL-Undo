@@ -23,7 +23,7 @@ public class MongoUndoUtils {
         DocumentVersions documentVersions = new DocumentVersions();
 
        
-        FindIterable<Document> logEntries = RecoveryUtils.getDocumentLogEntries(database, collection, _id);
+        FindIterable<Document> logEntries = RecoveryUtils.getDocumentLogEntries(database, collection, _id, 1);
 
         //Let's start the construction of every version
         documentVersions.addHeader("Version");

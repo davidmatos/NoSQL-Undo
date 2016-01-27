@@ -130,7 +130,7 @@ public class OpLog {
                     Document setParams = (Document) this.o.get("$set");
                     for (String key : setParams.keySet()) {
 
-                        oldDocument.put(key, o.get(key));
+                        oldDocument.put(key, setParams.get(key));
 
                     }
                 } else {

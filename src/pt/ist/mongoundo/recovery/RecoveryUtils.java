@@ -21,7 +21,7 @@ import pt.ist.mongoundo.MongoUndoConstants;
 public class RecoveryUtils {
     
     
-    public static FindIterable<Document> getDocumentLogEntries(String database, String collection, String _id){
+    public static FindIterable<Document> getDocumentLogEntries(String database, String collection, String _id, int asc){
         HashMap<String, Object> whereMap = new HashMap<String, Object>();
 String ns = database + "." + collection;
         ObjectId id = new ObjectId(_id);
@@ -38,7 +38,7 @@ String ns = database + "." + collection;
         FindIterable<Document> itLogEntries = MongoUndo.mongoClient.
                 getDatabase(MongoUndoConstants.LOCAL_DB).
                 getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where)
-                .sort(new Document("ts", -1));
+                .sort(new Document("ts", asc));
         return itLogEntries;
     }
 

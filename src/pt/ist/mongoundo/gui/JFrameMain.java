@@ -614,7 +614,6 @@ public class JFrameMain extends javax.swing.JFrame {
     }
 
     private void populateDocuments(String databaseName, String collectionName) {
-//        jTableDocuments.removeAll();
 
         ArrayList<String> headers = new ArrayList<>();
 
@@ -645,28 +644,8 @@ public class JFrameMain extends javax.swing.JFrame {
 
             }
         }
-         DefaultTableModel defaultTableModel = new DefaultTableModel(data, headers.toArray());
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, headers.toArray());
         jTableDocuments.setModel(defaultTableModel);
-
-//        DefaultTableModel defaultTableModel = new DefaultTableModel(data, headers.toArray());
-//        ListSelectionListener listSelectionListener = (ListSelectionEvent e) -> {
-//            if (e.getValueIsAdjusting()) {
-//                return;
-//            }
-//
-//            if (jTableDocuments.getSelectedRow() < 0) {
-//                return;
-//            }
-//
-//            int index = jTableDocuments.getSelectedRow();
-//
-//            Object _id = jTableDocuments.getValueAt(index, 0);
-//            populateDocumentLog(databaseName, collectionName, _id.toString());
-//        };
-
-//        jTableDocuments.setModel(defaultTableModel);
-//        jTableDocuments.getSelectionModel().
-//        jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
 
     }
 
@@ -674,7 +653,7 @@ public class JFrameMain extends javax.swing.JFrame {
         System.out.println("DB=" + database + " Collection=" + collection + " _id=" + _id);
         jTableDocumentLog.removeAll();
 
-        FindIterable<Document> itLogEntries = RecoveryUtils.getDocumentLogEntries(database, collection, _id);
+        FindIterable<Document> itLogEntries = RecoveryUtils.getDocumentLogEntries(database, collection, _id, -1);
         populateDocumentVersions(database, collection, _id);
         String[] headers = new String[]{"ts", "op", "ns", "o"};
         ArrayList<String[]> rows = new ArrayList<String[]>();
@@ -885,22 +864,19 @@ public class JFrameMain extends javax.swing.JFrame {
     }
 
     public void initDocumentsTable() {
-        
-        
-        
 
-        DefaultTableModel defaultTableModel = new DefaultTableModel(new Object[3][3], new Object[3]);
+        
         ListSelectionListener listSelectionListener = (ListSelectionEvent e) -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-        if (node == null) {
-            return;
-        }
-        if (node.getParent() == null) {
-            return;
-        }
+            if (node == null) {
+                return;
+            }
+            if (node.getParent() == null) {
+                return;
+            }
             String databaseName = node.getParent().toString();
             String collectionName = node.toString();
-            
+
             if (e.getValueIsAdjusting()) {
                 return;
             }
@@ -914,9 +890,6 @@ public class JFrameMain extends javax.swing.JFrame {
             Object _id = jTableDocuments.getValueAt(index, 0);
             populateDocumentLog(databaseName, collectionName, _id.toString());
         };
-
-        jTableDocuments.setModel(defaultTableModel);
-//        jTableDocuments.getSelectionModel().
         jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);
     }
 

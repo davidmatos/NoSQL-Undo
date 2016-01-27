@@ -25,41 +25,43 @@ public class OpLogUtils {
         ArrayList<OpLog> opLogs = new ArrayList<>();
         for (Document logEntry : it) {
             OpLog opLog = new OpLog(
-                    (BsonTimestamp)logEntry.get("ts"),
-                    logEntry.getString("op").charAt(0), 
-                    namespace, 
-                    (Document)logEntry.get("o"));
-            if(logEntry.containsKey("o2")){
-                opLog.setO2((Document)logEntry.get("o2"));
+                    (BsonTimestamp) logEntry.get("ts"),
+                    logEntry.getString("op").charAt(0),
+                    namespace,
+                    (Document) logEntry.get("o"));
+            if (logEntry.containsKey("o2")) {
+                opLog.setO2((Document) logEntry.get("o2"));
             }
             opLogs.add(opLog);
         }
 
-        
         return opLogs;
     }
-    
-    
+
     public static ArrayList<OpLog> getDatabaseOplogs(String database) {
         Document regexQuery = new Document();
-	regexQuery.put("ns", 
-		new Document("$regex", database+".*"));
+
+        regexQuery.put("ns",
+                new Document("$regex", database + "\\.*"));
         FindIterable<Document> it = MongoUndo.mongoClient.getDatabase("local").getCollection("oplog.$main")
                 .find(regexQuery).sort(new Document("ts", 1));
         ArrayList<OpLog> opLogs = new ArrayList<>();
         for (Document logEntry : it) {
-            OpLog opLog = new OpLog(
-                    (BsonTimestamp)logEntry.get("ts"),
-                    logEntry.getString("op").charAt(0), 
-                    logEntry.getString("ns"), 
-                    (Document)logEntry.get("o"));
-            if(logEntry.containsKey("o2")){
-                opLog.setO2((Document)logEntry.get("o2"));
+            if (logEntry.get("ns").toString().startsWith(database + ".")) {
+
+                OpLog opLog = new OpLog(
+                        (BsonTimestamp) logEntry.get("ts"),
+                        logEntry.getString("op").charAt(0),
+                        logEntry.getString("ns"),
+                        (Document) logEntry.get("o"));
+                if (logEntry.containsKey("o2")) {
+                    opLog.setO2((Document) logEntry.get("o2"));
+                }
+                opLogs.add(opLog);
             }
-            opLogs.add(opLog);
+
         }
 
-        
         return opLogs;
     }
 
