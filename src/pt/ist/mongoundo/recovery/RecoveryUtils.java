@@ -9,6 +9,7 @@ import com.mongodb.client.FindIterable;
 import static com.mongodb.client.model.Filters.where;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.bson.BsonTimestamp;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import pt.ist.mongoundo.MongoUndo;
@@ -21,10 +22,10 @@ import pt.ist.mongoundo.MongoUndoConstants;
 public class RecoveryUtils {
     
     
-    public static FindIterable<Document> getDocumentLogEntries(String database, String collection, String _id, int asc){
+    public static FindIterable<Document> getDocumentLogEntries(String database, String collection, Object id, int asc){
         HashMap<String, Object> whereMap = new HashMap<String, Object>();
 String ns = database + "." + collection;
-        ObjectId id = new ObjectId(_id);
+//        ObjectId id = new ObjectId(_id);
         whereMap.put("ns", ns);
 
         Document o = new Document("o._id", id);
@@ -42,5 +43,18 @@ String ns = database + "." + collection;
         return itLogEntries;
     }
 
-    
+    public static ArrayList<OpLog> getDocumentOpLogs(String database, String collection, Object _id, int asc){
+        ArrayList<OpLog> opLogs = new ArrayList<>();
+        FindIterable<Document> documentLogEntries = getDocumentLogEntries(database, collection, _id, asc);
+        for(Document doc : documentLogEntries){
+            OpLog opLog = new OpLog((BsonTimestamp)doc.get("ts"), doc.getString("op").charAt(0), 
+                    doc.getString("ns"), (Document)doc.get("o"));
+            if(doc.containsKey("o2")){
+                opLog.setO2((Document)doc.get("o2"));
+            }
+            opLogs.add(opLog);
+        }
+        
+        return opLogs;
+    }
 }

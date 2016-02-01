@@ -12,6 +12,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JCheckBox;
@@ -27,13 +28,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.bson.BsonTimestamp;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import pt.ist.mongoundo.DocumentVersions;
 
 import pt.ist.mongoundo.MongoUndo;
-import pt.ist.mongoundo.MongoUndoConstants;
 import pt.ist.mongoundo.MongoUndoUtils;
 import pt.ist.mongoundo.recovery.MongoRecoveryFull;
+import pt.ist.mongoundo.recovery.MongoRecoveryUndo;
 import pt.ist.mongoundo.recovery.OpLog;
 import pt.ist.mongoundo.recovery.OpLogUtils;
 import pt.ist.mongoundo.recovery.RecoveryUtils;
@@ -259,6 +259,11 @@ public class JFrameMain extends javax.swing.JFrame {
         });
 
         btnRecoverUndo.setText("Undo Recovery");
+        btnRecoverUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecoverUndoActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Timestamp");
 
@@ -280,7 +285,7 @@ public class JFrameMain extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jProgressBarRecovery, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addComponent(jProgressBarRecovery, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
                 .addContainerGap())
             .addComponent(jLabelCurrentOperation, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jLabelTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -293,7 +298,7 @@ public class JFrameMain extends javax.swing.JFrame {
                 .addComponent(jLabelCurrentOperation)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jProgressBarRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(400, Short.MAX_VALUE))
+                .addContainerGap(394, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout pnlRecoverActionsLayout = new javax.swing.GroupLayout(pnlRecoverActions);
@@ -315,12 +320,17 @@ public class JFrameMain extends javax.swing.JFrame {
             .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
-                        .addComponent(btnRecoverUndo)
-                        .addGap(67, 67, 67)
-                        .addComponent(btnRecoverSelective))
-                    .addComponent(jLabel4)
+                        .addComponent(jLabel4)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlRecoverActionsLayout.createSequentialGroup()
+                                .addComponent(btnRecoverUndo)
+                                .addGap(234, 234, 234)
+                                .addComponent(btnRecoverSelective))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlRecoverActionsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(93, 93, 93))
@@ -346,9 +356,9 @@ public class JFrameMain extends javax.swing.JFrame {
                     .addComponent(lblO))
                 .addGap(18, 18, 18)
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+                    .addComponent(jLabelRecoveryMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlRecoverActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRecoverSelective)
                     .addComponent(btnRecoverUndo)))
@@ -517,9 +527,14 @@ public class JFrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldSearchKeyTyped
 
     private void btnRecoverSelectiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecoverSelectiveActionPerformed
-
+        
         fullRecovery();
+
     }//GEN-LAST:event_btnRecoverSelectiveActionPerformed
+
+    private void btnRecoverUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecoverUndoActionPerformed
+        undoRecovery();
+    }//GEN-LAST:event_btnRecoverUndoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -810,6 +825,10 @@ public class JFrameMain extends javax.swing.JFrame {
 
     private void fullRecovery() {
 
+        Date dtStart = new Date();
+        
+        
+        
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         String database = node.getParent().toString();
         ArrayList<OpLog> opLogsToRemove = new ArrayList<>();
@@ -829,8 +848,43 @@ public class JFrameMain extends javax.swing.JFrame {
         MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToRemove, database);
 
         mongoRecoveryFull.recover();
+        
+        Date dtFinish = new Date();
+        
+        long total = dtFinish.getTime() - dtStart.getTime();
+        
+        jLabelCurrentOperation.setText("Finished in " + total + "ms");
     }
 
+    
+        private void undoRecovery() {
+            Date dtStart = new Date();
+
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        String database = node.getParent().toString();
+        ArrayList<OpLog> opLogsToRemove = new ArrayList<>();
+        TableModel model = tblLog.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            if ((boolean) model.getValueAt(i, 0)) {
+                OpLog opLog = new OpLog((BsonTimestamp) model.getValueAt(i, 1),
+                        (char) model.getValueAt(i, 2), (String) model.getValueAt(i, 3),
+                        (Document) model.getValueAt(i, 4));
+                if (!model.getValueAt(i, 5).toString().equals("")) {
+                    opLog.setO2((Document) model.getValueAt(i, 5));
+                }
+                opLogsToRemove.add(opLog);
+            }
+        }
+
+        MongoRecoveryUndo mongoRecoveryUndo = new MongoRecoveryUndo(opLogsToRemove, database);
+
+        mongoRecoveryUndo.recover();
+        Date dtFinish = new Date();
+        
+        long total = dtFinish.getTime() - dtStart.getTime();
+        jLabelCurrentOperation.setText("Finished in " + total + "ms");
+    }
+    
     private String recoveryProgress = "";
 
     public void addRecoveryProgressMessage(String message) {

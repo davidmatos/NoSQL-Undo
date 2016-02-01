@@ -17,15 +17,19 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 import com.mongodb.MongoClient;
+import java.util.ArrayList;
+import java.util.Date;
 import pt.ist.mongoundo.gui.JFrameMain;
+import pt.ist.mongoundo.recovery.MongoRecoveryFull;
+import pt.ist.mongoundo.recovery.MongoRecoveryUndo;
+import pt.ist.mongoundo.recovery.OpLog;
+import pt.ist.mongoundo.recovery.OpLogUtils;
 
 public class MongoUndo {
 
     private static HashMap<String, MongoConnection> connections = null;
 
     public static MongoClient mongoClient;
-
-    
 
     public static JFrameMain jFrameMain;
 
@@ -55,18 +59,55 @@ public class MongoUndo {
             java.util.logging.Logger.getLogger(JFrameMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                jFrameMain = new JFrameMain();
-                jFrameMain.setVisible(true);
-
-                jFrameMain = new JFrameMain();
-                jFrameMain.setVisible(true);
-                jFrameMain.setExtendedState(jFrameMain.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        mongoClient = new MongoClient("localhost", 27017);
+        if (args.length > 2) {
+            System.out.println("Starting sim");
+            int n = 0;
+            String mode = "";
+            ArrayList<OpLog> opLogsToRemove = new ArrayList<>();
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("-n")) {
+                    i++;
+                    n = Integer.parseInt(args[i]);
+                    opLogsToRemove = OpLogUtils.getDatabaseOplogs("ycsb", n);
+                }
+                if(args[i].equals("--mode")){
+                    i++;
+                    long time = 0;
+                    mode = args[i];
+                    if(args[i].equals("undo")){
+                        MongoRecoveryUndo mongoRecoveryUndo = new MongoRecoveryUndo(opLogsToRemove, "ycsb");
+                        Date dtStart = new Date();
+                        mongoRecoveryUndo.recover();
+                        Date dtFinish = new Date();
+                        time = dtFinish.getTime() - dtStart.getTime();
+                                
+                    }else{
+                        MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToRemove, "ycsb");
+                        Date dtStart = new Date();
+                        mongoRecoveryFull.recover();
+                        Date dtFinish = new Date();
+                        time = dtFinish.getTime() - dtStart.getTime();
+                    }
+                    
+                    System.out.println("Finished "+mode+" recovery with " + n + " opLogsToRemove in " + time + "ms");
+                }
             }
-        });
+
+        } else {
+
+            /* Create and display the form */
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    jFrameMain = new JFrameMain();
+                    jFrameMain.setVisible(true);
+
+                    jFrameMain = new JFrameMain();
+                    jFrameMain.setVisible(true);
+                    jFrameMain.setExtendedState(jFrameMain.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+                }
+            });
+        }
     }
 
     public static HashMap<String, MongoConnection> getConnectionsList() {
@@ -133,9 +174,5 @@ public class MongoUndo {
         mongoClient = client;
         jFrameMain.populateTree();
     }
-
-   
-
-    
 
 }

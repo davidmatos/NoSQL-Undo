@@ -15,41 +15,53 @@ import pt.ist.mongoundo.MongoUndo;
  * @author davidmatos
  */
 public class MongoRecoveryFull extends MongoRecovery {
-    
+
     public MongoRecoveryFull(ArrayList<OpLog> opLogsToRemove, String database) {
         super(opLogsToRemove, database);
-        
+
     }
 
     @Override
     public void recover() {
-        MongoUndo.jFrameMain.disableRecoveryButtons();
+        if (MongoUndo.jFrameMain != null) {
+            MongoUndo.jFrameMain.disableRecoveryButtons();
+        }
+
         Calendar cal = Calendar.getInstance();
-        String databaseName = getDatabase() + "_recovered_" + 
-                cal.get(Calendar.YEAR) +  cal.get(Calendar.MONTH) +  
-                cal.get(Calendar.DATE) + "__" +  cal.get(Calendar.HOUR_OF_DAY) +  
-                cal.get(Calendar.MINUTE) +  cal.get(Calendar.SECOND);
+        String databaseName = getDatabase() + "_recovered_"
+                + cal.get(Calendar.YEAR) + cal.get(Calendar.MONTH)
+                + cal.get(Calendar.DATE) + "__" + cal.get(Calendar.HOUR_OF_DAY)
+                + cal.get(Calendar.MINUTE) + cal.get(Calendar.SECOND);
         ArrayList<BsonTimestamp> opLogsToRemove = new ArrayList<>();
-        for(OpLog opLog: this.getOpLogsToRemove()){
+        for (OpLog opLog : this.getOpLogsToRemove()) {
             opLogsToRemove.add(opLog.getTs());
-        }        
+        }
         ArrayList<OpLog> opLogs = OpLogUtils.getDatabaseOplogs(getDatabase());
-        MongoUndo.jFrameMain.setNrOperations(opLogs.size() - opLogsToRemove.size());
+        if (MongoUndo.jFrameMain != null) {
+            MongoUndo.jFrameMain.setNrOperations(opLogs.size() - opLogsToRemove.size());
+        }
+
+        
+        
         opLogs.stream().forEach((oplog) -> {
-            if(!opLogsToRemove.contains(oplog.getTs())){
-                MongoUndo.jFrameMain.setCurrentOperation(oplog.toString());
-                oplog.execute(databaseName);
-            } 
+            if (!opLogsToRemove.contains(oplog.getTs())) {
+                if (MongoUndo.jFrameMain != null) {
+                    MongoUndo.jFrameMain.setCurrentOperation(oplog.toString());
+                }
+                
+                oplog.execute(databaseName);    
+                
+                
+            }
         });
 
         System.out.println("Finished recovering");
-         MongoUndo.jFrameMain.populateTree();
-         
-         MongoUndo.jFrameMain.enableRecoveryButtons();
+        if (MongoUndo.jFrameMain != null) {
+            MongoUndo.jFrameMain.populateTree();
+
+            MongoUndo.jFrameMain.enableRecoveryButtons();
+        }
+
     }
 
-  
-    
-    
-    
 }

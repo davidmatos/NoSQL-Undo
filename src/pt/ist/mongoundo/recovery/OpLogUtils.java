@@ -64,5 +64,40 @@ public class OpLogUtils {
 
         return opLogs;
     }
+    
+    
+    
+    
+    
+    public static ArrayList<OpLog> getDatabaseOplogs(String database, int n) {
+        Document regexQuery = new Document();
+
+        regexQuery.put("ns",
+                new Document("$regex", database + "\\.*"));
+        regexQuery.put("op", "i");
+        FindIterable<Document> it = MongoUndo.mongoClient.getDatabase("local").getCollection("oplog.$main")
+                .find(regexQuery).sort(new Document("ts", 1)).limit(n);
+        ArrayList<OpLog> opLogs = new ArrayList<>();
+        for (Document logEntry : it) {
+            if (logEntry.get("ns").toString().startsWith(database + ".")) {
+
+                OpLog opLog = new OpLog(
+                        (BsonTimestamp) logEntry.get("ts"),
+                        logEntry.getString("op").charAt(0),
+                        logEntry.getString("ns"),
+                        (Document) logEntry.get("o"));
+                if (logEntry.containsKey("o2")) {
+                    opLog.setO2((Document) logEntry.get("o2"));
+                }
+                opLogs.add(opLog);
+                if(opLogs.size() == n){
+                    return opLogs;
+                }
+            }
+
+        }
+
+        return opLogs;
+    }
 
 }

@@ -101,9 +101,9 @@ public class OpLog {
         if (op == 'c') {
             if (this.o.containsKey("create")) {
 
-                System.out.println("Created collectio: " + this.o.get("create").toString());
+//                System.out.println("Created collectio: " + this.o.get("create").toString());
             } else if (this.o.containsKey("drop")) {
-                System.out.println("Drop database: " + this.o.get("drop").toString());
+//                System.out.println("Drop database: " + this.o.get("drop").toString());
                // MongoUndo.mongoClient.getDatabase(this.o.get("drop").toString()).drop();
             }
 
@@ -117,7 +117,7 @@ public class OpLog {
                 
                 if(collection.find(new Document("_id", this.getO().get("_id"))).first() == null){
                 collection.insertOne(this.o);
-                System.out.println("Inserted document");
+//                System.out.println("Inserted document");
                 }
                 
                 
@@ -136,14 +136,14 @@ public class OpLog {
                 } else {
                     oldDocument = this.o;
                 }
-                System.out.println("Vou atualizar: " + this.o2.toString() + " com " + oldDocument.toString());
+//                System.out.println("Vou atualizar: " + this.o2.toString() + " com " + oldDocument.toString());
                 collection.updateOne(this.o2, new Document("$set", oldDocument));
                 
-                System.out.println("Updated document");
+//                System.out.println("Updated document");
                 break;
             case 'd':
                 collection.deleteOne(this.o);
-                System.out.println("Deleted document");
+//                System.out.println("Deleted document");
             default:
 
                 break;
