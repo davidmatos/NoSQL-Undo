@@ -69,13 +69,14 @@ public class MongoUndo {
                 if (args[i].equals("-n")) {
                     i++;
                     n = Integer.parseInt(args[i]);
-                    opLogsToRemove = OpLogUtils.getDatabaseOplogs("ycsb", n);
+                    
                 }
                 if(args[i].equals("--mode")){
                     i++;
                     long time = 0;
                     mode = args[i];
                     if(args[i].equals("undo")){
+                        opLogsToRemove = OpLogUtils.getDatabaseOplogs("ycsb", n);
                         MongoRecoveryUndo mongoRecoveryUndo = new MongoRecoveryUndo(opLogsToRemove, "ycsb");
                         Date dtStart = new Date();
                         mongoRecoveryUndo.recover();
@@ -83,6 +84,7 @@ public class MongoUndo {
                         time = dtFinish.getTime() - dtStart.getTime();
                                 
                     }else{
+                        opLogsToRemove = OpLogUtils.getDatabaseOplogs("ycsb", 100000-n);
                         MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToRemove, "ycsb");
                         Date dtStart = new Date();
                         mongoRecoveryFull.recover();

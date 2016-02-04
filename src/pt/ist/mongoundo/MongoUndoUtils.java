@@ -18,7 +18,7 @@ import pt.ist.mongoundo.recovery.RecoveryUtils;
  */
 public class MongoUndoUtils {
 
-    public static DocumentVersions getDocumentVersions(String database, String collection, String _id) {
+    public static DocumentVersions getDocumentVersions(String database, String collection, ObjectId _id) {
 
         DocumentVersions documentVersions = new DocumentVersions();
 

@@ -28,6 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.bson.BsonTimestamp;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import pt.ist.mongoundo.DocumentVersions;
 
 import pt.ist.mongoundo.MongoUndo;
@@ -665,15 +666,16 @@ public class JFrameMain extends javax.swing.JFrame {
     }
 
     private void populateDocumentLog(String database, String collection, String _id) {
-        System.out.println("DB=" + database + " Collection=" + collection + " _id=" + _id);
+        
         jTableDocumentLog.removeAll();
-
-        FindIterable<Document> itLogEntries = RecoveryUtils.getDocumentLogEntries(database, collection, _id, -1);
         populateDocumentVersions(database, collection, _id);
+        FindIterable<Document> itLogEntries = RecoveryUtils.getDocumentLogEntries(database, collection, new ObjectId(_id), -1);
+        
+        
         String[] headers = new String[]{"ts", "op", "ns", "o"};
-        ArrayList<String[]> rows = new ArrayList<String[]>();
+        ArrayList<String[]> rows = new ArrayList<>();
         for (Document logEntry : itLogEntries) {
-
+            
             rows.add(new String[]{
                 logEntry.get(headers[0]).toString(),
                 logEntry.get(headers[1]).toString(),
@@ -710,8 +712,8 @@ public class JFrameMain extends javax.swing.JFrame {
         selectedCollection = collection;
         selectedId = _id;
         jTableDocumentVersions.removeAll();
-
-        DocumentVersions documentVersions = MongoUndoUtils.getDocumentVersions(database, collection, _id);
+        
+        DocumentVersions documentVersions = MongoUndoUtils.getDocumentVersions(database, collection, new ObjectId(_id));
         int i = 0, j = 0, size = documentVersions.getRows().size();
         Object[][] data = new Object[documentVersions.getRows().size()][documentVersions.getHeaders().size()];
         for (HashMap<String, Object> r : documentVersions.getRows()) {
@@ -831,21 +833,21 @@ public class JFrameMain extends javax.swing.JFrame {
         
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         String database = node.getParent().toString();
-        ArrayList<OpLog> opLogsToRemove = new ArrayList<>();
+        ArrayList<OpLog> opLogsToKeep = new ArrayList<>();
         TableModel model = tblLog.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
-            if ((boolean) model.getValueAt(i, 0)) {
+            if (!(boolean) model.getValueAt(i, 0)) {
                 OpLog opLog = new OpLog((BsonTimestamp) model.getValueAt(i, 1),
                         (char) model.getValueAt(i, 2), (String) model.getValueAt(i, 3),
                         (Document) model.getValueAt(i, 4));
                 if (!model.getValueAt(i, 5).toString().equals("")) {
                     opLog.setO2((Document) model.getValueAt(i, 5));
                 }
-                opLogsToRemove.add(opLog);
+                opLogsToKeep.add(opLog);
             }
         }
 
-        MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToRemove, database);
+        MongoRecoveryFull mongoRecoveryFull = new MongoRecoveryFull(opLogsToKeep, database);
 
         mongoRecoveryFull.recover();
         
@@ -921,6 +923,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
         
         ListSelectionListener listSelectionListener = (ListSelectionEvent e) -> {
+            
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             if (node == null) {
                 return;
@@ -942,6 +945,7 @@ public class JFrameMain extends javax.swing.JFrame {
             int index = jTableDocuments.getSelectedRow();
 
             Object _id = jTableDocuments.getValueAt(index, 0);
+            
             populateDocumentLog(databaseName, collectionName, _id.toString());
         };
         jTableDocuments.getSelectionModel().addListSelectionListener(listSelectionListener);

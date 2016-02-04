@@ -23,23 +23,22 @@ public class RecoveryUtils {
     
     
     public static FindIterable<Document> getDocumentLogEntries(String database, String collection, Object id, int asc){
-        HashMap<String, Object> whereMap = new HashMap<String, Object>();
-String ns = database + "." + collection;
-//        ObjectId id = new ObjectId(_id);
-        whereMap.put("ns", ns);
+        Document where = new Document();
+        String ns = database + "." + collection;
 
-        Document o = new Document("o._id", id);
-        Document o2 = new Document("o2._id", id);
-
-        ArrayList<Document> oArray = new ArrayList<Document>();
-        oArray.add(o);
-        oArray.add(o2);
-        whereMap.put("$or", oArray);
-        Document where = new Document(whereMap);
+        ArrayList<Document> orArray = new ArrayList<>();
+        orArray.add(new Document("o._id", id));
+        orArray.add(new Document("o2._id", id));
+        
+        where.put("ns", ns);
+        where.put("$or", orArray);
+        
+        
         FindIterable<Document> itLogEntries = MongoUndo.mongoClient.
                 getDatabase(MongoUndoConstants.LOCAL_DB).
                 getCollection(MongoUndoConstants.OP_LOG_TABLE).find(where)
                 .sort(new Document("ts", asc));
+        
         return itLogEntries;
     }
 
