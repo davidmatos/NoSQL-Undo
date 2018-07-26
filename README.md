@@ -2,7 +2,7 @@
 
 NoSQL-Undo is a recovery approach and tool that allows database administrators to remove the effect of undesirable actions by undoing operations, leading the system to a consistent state. NOSQL UNDO leverages the logging and snapshot mechanisms built-in NoSQL databases, and is able to undo operations as long as they are present in the logs.
 
-![System architecture of NoSQL-Undo](doc/img/NoSQLUndoArch.pdf)
+![System architecture of NoSQL-Undo](doc/img/NoSQLUndoArch.png)
 
 Currently NoSQL Undo only supports MongoDB, it is possible to extend it to support other NoSQL databases.
 
