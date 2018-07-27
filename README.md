@@ -70,5 +70,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* **[David Matos](https://github.com/davidmatos)**
 * **[Prof. Miguel Correia](https://github.com/mpcorreia)**
